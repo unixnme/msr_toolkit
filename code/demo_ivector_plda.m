@@ -90,7 +90,7 @@ fea_ext = '.htk';
 fid = fopen('speaker_model_maps.lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
-model_ids = unique(C{1}, 'stable');
+model_ids = myunique(C{1}, 'stable');
 model_files = C{2};
 nspks = length(model_ids);
 model_ivs1 = zeros(tv_dim, nspks);
@@ -113,8 +113,8 @@ trial_list = 'trials.lst';
 fid = fopen(trial_list, 'rt');
 C = textscan(fid, '%s %s %s');
 fclose(fid);
-[model_ids, ~, Kmodel] = unique(C{1}, 'stable'); % check if the order is the same as above!
-[test_files, ~, Ktest] = unique(C{2}, 'stable');
+[model_ids, ~, Kmodel] = myunique(C{1}, 'stable'); % check if the order is the same as above!
+[test_files, ~, Ktest] = myunique(C{2}, 'stable');
 test_files = cellfun(@(x) fullfile(fea_dir, [x, fea_ext]),...  %# Prepend path to files
                        test_files, 'UniformOutput', false);
 test_ivs = zeros(tv_dim, length(test_files));

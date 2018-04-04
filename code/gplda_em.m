@@ -49,7 +49,7 @@ end
 % make sure the labels are sorted
 [spk_labs, I] = sort(spk_labs);
 data = data(:, I);
-[~, ia, ic] = unique(spk_labs, 'stable');
+[~, ia, ic] = myunique(spk_labs, 'stable');
 spk_counts = histc(ic, 1 : numel(ia)); % # sessions per speaker
 
 M = mean(data, 2);
@@ -94,7 +94,7 @@ Ey  = zeros(nphi, nsamples);
 Eyy = zeros(nphi);
 
 % initialize common terms to save computations
-uniqFreqs  	  = unique(spk_counts);
+uniqFreqs  	  = myunique(spk_counts);
 nuniq 		  = size(uniqFreqs, 1);
 invTerms      = cell(nuniq, 1);
 invTerms(:)   = {zeros(nphi)};
