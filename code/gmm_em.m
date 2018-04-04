@@ -53,6 +53,7 @@ mix = 1;
 while ( mix <= nmix )
 	if ( mix >= nmix/2 ), ds_factor = 1; end % not for the last two splits!
     fprintf('\nRe-estimating the GMM hyperparameters for %d components ...\n', mix);
+    fflush(stdout);
     for iter = 1 : niter(log2(mix) + 1)
         fprintf('EM iter#: %d \t', iter);
         N = 0; F = 0; S = 0; L = 0; nframes = 0;
