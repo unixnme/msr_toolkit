@@ -54,4 +54,16 @@ with open('ubm.lst', 'w') as f:
 with open('ubm_ind.lst', 'w') as f:
     f.write(ubm_ind_to_write)
 
+with open('train.lst', 'w') as f:
+    for spkr in speaker_list[:N]:
+        for filepath in train_files[spkr]:
+            f.write(spkr + ' ' + filepath + '\n')
+
+with open('test.lst', 'w') as f:
+    for spkr in speaker_list[:N]:
+        for trial,files in test_files.items():
+            if spkr == trial: label = 'target'
+            else: label = 'imposter'
+            for filepath in files:
+                f.write(spkr + ' ' + filepath + ' ' + label + '\n')
 
