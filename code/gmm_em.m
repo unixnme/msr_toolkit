@@ -66,6 +66,7 @@ while ( mix <= nmix )
         end
         tim = toc(tim);
         fprintf('[llk = %.2f] \t [elaps = %.2f s]\n', L/nframes, tim);
+        fflush(stdout);
         gmm = maximization(N, F, S);
     end
     if ( mix < nmix ), 
