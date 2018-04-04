@@ -34,6 +34,8 @@ Microsoft Research, Conversational Systems Research Center
 clc
 clear
 
+nworkers = 1;
+
 %% Step1: Training the UBM
 dataList = '../ubm.lst';
 nmix = 256;
