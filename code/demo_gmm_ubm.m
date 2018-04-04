@@ -34,23 +34,19 @@ Microsoft Research, Conversational Systems Research Center
 clc
 clear
 
-%% Step0: Opening MATLAB pool
-nworkers = 12;
-nworkers = min(nworkers, feature('NumCores'));
-isopen = matlabpool('size')>0;
-if ~isopen, matlabpool(nworkers); end
-
 %% Step1: Training the UBM
-dataList = 'lists/ubm.lst';
+dataList = '../ubm.lst';
 nmix = 256;
 final_niter = 10;
 ds_factor = 1;
 ubm = gmm_em(dataList, nmix, final_niter, ds_factor, nworkers);
+save('ubm.mat', 'ubm');
+% load('ubm.mat')
 
 %% Step2: Adapting the speaker models from UBM
-fea_dir = '../features/';
-fea_ext = '.htk';
-fid = fopen('../lists/speaker_model_maps.lst', 'rt');
+fea_dir = '';
+fea_ext = '';
+fid = fopen('../train..lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
 model_ids = unique(C{1}, 'stable');
@@ -68,9 +64,9 @@ for spk = 1 : nspks,
 end
 
 %% Step3: Scoring the verification trials
-fea_dir = '../features/';
-fea_ext = '.htk';
-trial_list = '../lists/trials.lst';
+fea_dir = '';
+fea_ext = '';
+trial_list = '../test.lst';
 fid = fopen(trial_list, 'rt');
 C = textscan(fid, '%s %s %s');
 fclose(fid);
