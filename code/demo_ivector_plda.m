@@ -35,23 +35,20 @@ Microsoft Research, Conversational Systems Research Center
 clc
 clear
 
-%% Step0: Opening MATLAB pool
-nworkers = 12;
-nworkers = min(nworkers, feature('NumCores'));
-isopen = matlabpool('size')>0;
-if ~isopen, matlabpool(nworkers); end
+nworkers = 1;
 
 %% Step1: Training the UBM
-dataList = 'ubm.lst';
+dataList = '../ubm.lst';
 nmix        = 256;
 final_niter = 10;
 ds_factor   = 1;
-ubm = gmm_em(dataList, nmix, final_niter, ds_factor, nworkers);
+% ubm = gmm_em(dataList, nmix, final_niter, ds_factor, nworkers);
+load('ubm.mat');
 
 %% Step2: Learning the total variability subspace from background data
 tv_dim = 400; 
 niter  = 5;
-dataList = 'ubm.lst';
+dataList = '../ubm.lst';
 fid = fopen(dataList, 'rt');
 C = textscan(fid, '%s');
 fclose(fid);
@@ -67,17 +64,17 @@ T = train_tv_space(stats, ubm, tv_dim, niter, nworkers);
 lda_dim = 200;
 nphi    = 200;
 niter   = 10;
-dataList = 'ubm_with_inds.lst';
+dataList = '../ubm_ind.lst';
 fid = fopen(dataList, 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
-feaFiles = C{1};
+feaFiles = C{2};
 dev_ivs = zeros(tv_dim, length(feaFiles));
 parfor file = 1 : length(feaFiles),
     dev_ivs(:, file) = extract_ivector(stats{file}, ubm, T);
 end
 % reduce the dimensionality with LDA
-spk_labs = C{2};
+spk_labs = C{1};
 V = lda(dev_ivs, spk_labs);
 dev_ivs = V(:, 1 : lda_dim)' * dev_ivs;
 %------------------------------------
@@ -85,12 +82,13 @@ plda = gplda_em(dev_ivs, spk_labs, nphi, niter);
 
 
 %% Step4: Scoring the verification trials
-fea_dir = '../features/';
-fea_ext = '.htk';
-fid = fopen('speaker_model_maps.lst', 'rt');
+fea_dir = '';
+fea_ext = '';
+fid = fopen('train.lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
 model_ids = myunique(C{1}, 'stable');
+train_ids = model_ids
 model_files = C{2};
 nspks = length(model_ids);
 model_ivs1 = zeros(tv_dim, nspks);
@@ -109,11 +107,12 @@ parfor spk = 1 : nspks,
     model_ivs2(:, spk) = extract_ivector([N; F]/length(spk_files), ubm, T); % stats averaging!
     model_ivs1(:, spk) = model_ivs1(:, spk)/length(spk_files); % i-vector averaging!
 end
-trial_list = 'trials.lst';
+trial_list = '../test.lst';
 fid = fopen(trial_list, 'rt');
 C = textscan(fid, '%s %s %s');
 fclose(fid);
 [model_ids, ~, Kmodel] = myunique(C{1}, 'stable'); % check if the order is the same as above!
+assert(isequal(model_ids, train_ids));
 [test_files, ~, Ktest] = myunique(C{2}, 'stable');
 test_files = cellfun(@(x) fullfile(fea_dir, [x, fea_ext]),...  %# Prepend path to files
                        test_files, 'UniformOutput', false);
@@ -136,6 +135,6 @@ scores2 = scores2(linearInd); % select the valid trials
 
 %% Step5: Computing the EER and plotting the DET curve
 labels = C{3};
-eer1 = compute_eer(scores1(linearInd), labels, true); % IV averaging
+eer1 = compute_eer(scores1, labels, true); % IV averaging
 hold on
-eer2 = compute_eer(scores2(linearInd), labels, true); % stats averaging
+eer2 = compute_eer(scores2, labels, true); % stats averaging

@@ -54,6 +54,7 @@ fid = fopen('../train.lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
 model_ids = myunique(C{1}, 'stable');
+train_ids = model_ids;
 model_files = C{2};
 nspks = length(model_ids);
 map_tau = 10.0;
@@ -75,6 +76,7 @@ fid = fopen(trial_list, 'rt');
 C = textscan(fid, '%s %s %s');
 fclose(fid);
 [model_ids, ~, Kmodel] = myunique(C{1}, 'stable'); % check if the order is the same as above!
+assert(isequal(model_ids, train_ids));
 [test_files, ~, Ktest] = myunique(C{2}, 'stable');
 test_files = cellfun(@(x) fullfile(fea_dir, [x, fea_ext]),...  %# Prepend path to files
                        test_files, 'UniformOutput', false);
