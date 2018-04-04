@@ -77,6 +77,7 @@ for iter = 1 : niter
     [Phi, Sigma] = maximization_plda(data, Ey, Eyy);
     tim = toc(tim);
     fprintf('[elaps = %.2f s]\n', tim);
+    fflush(stdout);
 end
 
 plda.Phi   = Phi;

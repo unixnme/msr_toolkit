@@ -59,6 +59,8 @@ parfor file = 1 : length(feaFiles),
     stats{file} = [N; F];
 end
 T = train_tv_space(stats, ubm, tv_dim, niter, nworkers);
+save('T.mat', 'T', 'stats');
+%load('T.mat');
 
 %% Step3: Training the Gaussian PLDA model with development i-vectors
 lda_dim = 200;
@@ -77,6 +79,7 @@ end
 spk_labs = C{1};
 V = lda(dev_ivs, spk_labs);
 dev_ivs = V(:, 1 : lda_dim)' * dev_ivs;
+save('dev_ivs.mat', 'dev_ivs');
 %------------------------------------
 plda = gplda_em(dev_ivs, spk_labs, nphi, niter);
 
