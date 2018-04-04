@@ -63,7 +63,7 @@ save('T.mat', 'T', 'stats');
 %load('T.mat');
 
 %% Step3: Training the Gaussian PLDA model with development i-vectors
-lda_dim = 200;
+lda_dim = 100;
 nphi    = 200;
 niter   = 10;
 dataList = '../ubm_ind.lst';
