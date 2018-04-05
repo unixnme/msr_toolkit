@@ -48,7 +48,7 @@ Sigma_i = pinv(Sigma_tot-Sigma_ac*Sigma_tot_i*Sigma_ac);
 Q = Sigma_tot_i-Sigma_i;
 P = (Sigma_tot_i * Sigma_ac) * Sigma_i;
 
-[U, S] = svd(P);
+[U, S, ~] = svd(P);
 S = diag(S);
 Lambda = diag(S(1 : nphi));
 Uk     = U(:, 1 : nphi);

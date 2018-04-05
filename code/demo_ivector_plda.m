@@ -92,7 +92,7 @@ fid = fopen('../train.lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
 model_ids = myunique(C{1}, 'stable');
-train_ids = model_ids
+train_ids = model_ids;
 model_files = C{2};
 nspks = length(model_ids);
 model_ivs1 = zeros(tv_dim, nspks);
