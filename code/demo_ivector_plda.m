@@ -54,13 +54,13 @@ C = textscan(fid, '%s');
 fclose(fid);
 feaFiles = C{1};
 stats = cell(length(feaFiles), 1);
-parfor file = 1 : length(feaFiles),
-    [N, F] = compute_bw_stats(feaFiles{file}, ubm);
-    stats{file} = [N; F];
-end
-T = train_tv_space(stats, ubm, tv_dim, niter, nworkers);
-save('T.mat', 'T', 'stats');
-%load('T.mat');
+%parfor file = 1 : length(feaFiles),
+%    [N, F] = compute_bw_stats(feaFiles{file}, ubm);
+%    stats{file} = [N; F];
+%end
+%T = train_tv_space(stats, ubm, tv_dim, niter, nworkers);
+load('T.mat');
+%save('T.mat', 'T', 'stats');
 
 %% Step3: Training the Gaussian PLDA model with development i-vectors
 lda_dim = 100;
@@ -72,14 +72,15 @@ C = textscan(fid, '%s %s');
 fclose(fid);
 feaFiles = C{2};
 dev_ivs = zeros(tv_dim, length(feaFiles));
-parfor file = 1 : length(feaFiles),
-    dev_ivs(:, file) = extract_ivector(stats{file}, ubm, T);
-end
+%parfor file = 1 : length(feaFiles),
+%    dev_ivs(:, file) = extract_ivector(stats{file}, ubm, T);
+%end
 % reduce the dimensionality with LDA
 spk_labs = C{1};
 V = lda(dev_ivs, spk_labs);
-dev_ivs = V(:, 1 : lda_dim)' * dev_ivs;
-save('dev_ivs.mat', 'dev_ivs');
+%dev_ivs = V(:, 1 : lda_dim)' * dev_ivs;
+%save('dev_ivs.mat', 'dev_ivs');
+load('dev_ivs.mat');
 %------------------------------------
 plda = gplda_em(dev_ivs, spk_labs, nphi, niter);
 
@@ -87,7 +88,7 @@ plda = gplda_em(dev_ivs, spk_labs, nphi, niter);
 %% Step4: Scoring the verification trials
 fea_dir = '';
 fea_ext = '';
-fid = fopen('train.lst', 'rt');
+fid = fopen('../train.lst', 'rt');
 C = textscan(fid, '%s %s');
 fclose(fid);
 model_ids = myunique(C{1}, 'stable');

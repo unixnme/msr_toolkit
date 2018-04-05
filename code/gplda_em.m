@@ -60,9 +60,9 @@ data = W1' * data; % whitening the data
 
 fprintf('\n\nRandomly initializing the PLDA hyperparameters ...\n\n');
 % Initialize the parameters randomly
-[s1, s2] = RandStream.create('mrg32k3a', 'NumStreams', 2);
-Sigma    = 100 * randn(s1, ndim); % covariance matrix of the residual term
-Phi = randn(s2, ndim, nphi); % factor loading matrix (Eignevoice matrix)
+%[s1, s2] = RandStream.create('mrg32k3a', 'NumStreams', 2);
+Sigma    = 100 * randn(ndim); % covariance matrix of the residual term
+Phi = randn(ndim, nphi); % factor loading matrix (Eignevoice matrix)
 Phi = bsxfun(@minus, Phi, mean(Phi, 2));
 W2   = calc_white_mat(Phi' * Phi);
 Phi = Phi * W2; % orthogonalize Eigenvoices (columns)
