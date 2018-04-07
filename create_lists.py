@@ -10,7 +10,7 @@ files = glob.glob(DIR + '/**/*.mfc', recursive=True)
 # collect by user
 speakers = {}
 for filepath in files:
-    spkr = filepath.split('/')[-2]
+    spkr = filepath.split('/')[-3]
     if spkr not in speakers:
         speakers[spkr] = []
     speakers[spkr].append(filepath)
