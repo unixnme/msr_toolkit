@@ -4,7 +4,7 @@ import numpy as np
 np.random.seed(0)
 
 # find all mfc files
-DIR = '../LibriSpeech'
+DIR = 'LibriSpeech'
 files = glob.glob(DIR + '/**/*.mfc', recursive=True)
 
 # collect by user
@@ -37,13 +37,14 @@ for spkr in speaker_list[N:]:
     files = speakers[spkr]
     ubm_files[spkr] = files
 
+PRE_PATH = '../'
 ubm_to_write = ''
 ubm_ind_to_write = ''
 for spkr in speaker_list[N:]:
     files = ubm_files[spkr]
     for filepath in files:
-        ubm_to_write += filepath + '\n'
-        ubm_ind_to_write += spkr + ' ' + filepath + '\n'
+        ubm_to_write += PRE_PATH + filepath + '\n'
+        ubm_ind_to_write += spkr + ' ' + PRE_PATH + filepath + '\n'
 
 with open('ubm.lst', 'w') as f:
     f.write(ubm_to_write)
@@ -54,7 +55,7 @@ with open('ubm_ind.lst', 'w') as f:
 with open('train.lst', 'w') as f:
     for spkr in speaker_list[:N]:
         for filepath in train_files[spkr]:
-            f.write(spkr + ' ' + filepath + '\n')
+            f.write(spkr + ' ' + PRE_PATH + filepath + '\n')
 
 with open('test.lst', 'w') as f:
     for spkr in speaker_list[:N]:
@@ -63,5 +64,5 @@ with open('test.lst', 'w') as f:
             if spkr == trial: label = 'target'
             else: label = 'imposter'
             for filepath in files:
-                f.write(spkr + ' ' + filepath + ' ' + label + '\n')
+                f.write(spkr + ' ' + PRE_PATH + filepath + ' ' + label + '\n')
 
