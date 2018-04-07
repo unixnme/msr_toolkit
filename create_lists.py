@@ -15,10 +15,6 @@ for filepath in files:
         speakers[spkr] = []
     speakers[spkr].append(filepath)
 
-min_files = 0
-for spkr,entry in speakers.items():
-    min_files = min(min_files, len(entry))
-
 # choose N users for test / train
 N = len(speakers) // 10
 speaker_list = np.asarray(sorted(list(speakers.keys())))
@@ -27,7 +23,7 @@ np.random.shuffle(speaker_list)
 # select M files for train
 train_files = {}
 test_files = {}
-M = min_files - 1
+M = 5
 for spkr in speaker_list[:N]:
     # these are train/test speakers
     files = speakers[spkr]
@@ -43,7 +39,8 @@ for spkr in speaker_list[N:]:
 
 ubm_to_write = ''
 ubm_ind_to_write = ''
-for spkr,files in ubm_files.items():
+for spkr in speaker_list[N:]:
+    files = ubm_files[spkr]
     for filepath in files:
         ubm_to_write += filepath + '\n'
         ubm_ind_to_write += spkr + ' ' + filepath + '\n'
@@ -61,7 +58,8 @@ with open('train.lst', 'w') as f:
 
 with open('test.lst', 'w') as f:
     for spkr in speaker_list[:N]:
-        for trial,files in test_files.items():
+        for trial in speaker_list[:N]:
+            files = test_files[spkr]
             if spkr == trial: label = 'target'
             else: label = 'imposter'
             for filepath in files:

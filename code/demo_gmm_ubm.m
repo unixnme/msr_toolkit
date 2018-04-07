@@ -41,9 +41,9 @@ dataList = '../ubm.lst';
 nmix = 256;
 final_niter = 10;
 ds_factor = 1;
-ubm = gmm_em(dataList, nmix, final_niter, ds_factor, nworkers);
-save('ubm.mat', 'ubm');
-%load('ubm.mat')
+%ubm = gmm_em(dataList, nmix, final_niter, ds_factor, nworkers);
+%save('ubm.mat', 'ubm');
+load('ubm.mat')
 disp('step1 done');
 fflush(stdout);
 
