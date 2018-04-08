@@ -34,13 +34,42 @@ def htkread(filename, endian='little'):
         feakind = data[0]
 
         ndim = nbytes // 4
-        data = np.fromfile(f, dtype=op + 'f4').reshape(ndim, -1)
+        # this part is so crucial!!
+        data = np.fromfile(f, dtype=op + 'f4').reshape(-1, ndim).T
 
     return data, frate, feakind
 
 
+def load_data(dataList):
+    if isinstance(dataList, str):
+        with open(dataList, 'r') as f:
+            filenames = f.read().split()
+    else:
+        filenames = dataList
+
+    data = []
+    for i,filename in enumerate(filenames):
+        d, _, _ = htkread(filename)
+        data.append(d)
+
+    return data
+
+def comp_gm_gv(dataList):
+    gm = np.zeros(dataList[0].shape[0])
+    gv = np.zeros(dataList[0].shape[0])
+    nframes = 0
+    for data in dataList:
+        gm += data.sum(axis=1)
+        nframes += data.shape[1]
+
+    gm /= nframes
+    return gm
+
 def gmm_em(dataList, nmix, final_niter, ds_factor):
-    pass
+    dataList = load_data(dataList)
+    nfiles = len(dataList)
+    gm = comp_gm_gv(dataList)
+    print(gm)
 
 dataList = '../ubm.lst'
 nmix = 256
@@ -48,5 +77,5 @@ final_niter = 10
 ds_factor = 1
 ubm = gmm_em(dataList, nmix, final_niter, ds_factor)
 
-data, frate, feakind = htkread('../LibriSpeech/dev-clean/2277/149874/2277-149874-0002.mfc')
+data = load_data(dataList)
 
