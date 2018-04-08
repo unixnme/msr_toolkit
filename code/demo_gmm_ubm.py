@@ -64,33 +64,56 @@ def comp_gm_gv(dataList):
 
     return gm, gv
 
+def mixup(model):
+    mu = model.means_
+    sigma = 1/model.precisions_
+    w = model.weights_
+    nmix, ndim = sigma.shape
+    arg_max = np.argmax(sigma, axis=1)
+    max_sigma = sigma[np.arange(nmix), arg_max]
+    eps = np.zeros_like(mu)
+    eps[np.arange(nmix), arg_max] = np.sqrt(max_sigma)
+    mu = np.concatenate([mu-eps, mu+eps])
+    sigma = np.concatenate([sigma, sigma])
+    w = np.concatenate([w, w]) / 2
+
+    return GaussianMixture(nmix*2, 'diag', means_init=mu, precisions_init=1/sigma, weights_init=w, verbose=0, max_iter=100)
+    
+def apply_var_floors(w, sigma, floor_const):
+    vFloor = np.dot(w.reshape(1,-1), sigma) * floor_const
+    sigma = np.maximum(sigma, vFloor)
+    return sigma
+
 def gmm_em(dataList, nmix, final_niter, ds_factor):
     dataList = load_data(dataList)
     nfiles = len(dataList)
     gm, gv = comp_gm_gv(dataList)
+    #niter = [1,2,4,4,4,4,6,6,10,10,15]
+    #niter[int(np.log2(nmix))] = final_niter
+    niter = np.ones(10, dtype=np.int32)
 
-    model = GaussianMixture(1, 'diag')
+    model = GaussianMixture(1, 'diag', verbose=0, max_iter=100)
     data = np.concatenate(dataList, axis=1).T
-    niter = [1, 2, 4, 4, 4, 4, 6, 6, 10, 10, 15]
-    niter[int(np.log2(nmix))] = final_niter
 
     mix = 1
     while mix <= nmix:
         if mix >= nmix//2:
             ds_factor = 1
-
-        print('Re-estimating the GMM hyperparameters for %d components ...' % mix)
+        print('\nRe-estimating the GMM hyperparameters for %d components ...' % mix)
         for i in range(niter[int(np.log2(mix))]):
             print('EM iter#: %d \t' % i, end='')
             model.fit(data)
+            w = model.weights_
+            sigma = model.covariances_
+            sigma = apply_var_floors(w, sigma, 1)
+            model.precisions_ = 1/sigma
+            model.covariances = sigma
             llk,_ = model._estimate_log_prob_resp(data)
             print('[llk = %.2f]' % np.mean(llk))
 
         if mix < nmix:
-            mix *= 2
-            gm = model.means_
-            gm = np.concatenate([gm, gm])
-            model = GaussianMixture(mix, 'diag', means_init=gm)
+            model = mixup(model)
+        mix *= 2
             
     pass
 
