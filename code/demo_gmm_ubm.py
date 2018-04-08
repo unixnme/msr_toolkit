@@ -61,15 +61,20 @@ def comp_gm_gv(dataList):
     for data in dataList:
         gm += data.sum(axis=1)
         nframes += data.shape[1]
-
     gm /= nframes
-    return gm
+
+    for data in dataList:
+        gv += ((data - gm.reshape(-1,1))**2).sum(axis=1)
+    gv /= nframes - 1
+
+    return gm, gv
 
 def gmm_em(dataList, nmix, final_niter, ds_factor):
     dataList = load_data(dataList)
     nfiles = len(dataList)
-    gm = comp_gm_gv(dataList)
+    gm, gv = comp_gm_gv(dataList)
     print(gm)
+    print(gv)
 
 dataList = '../ubm.lst'
 nmix = 256
